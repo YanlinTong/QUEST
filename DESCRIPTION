@@ -1,0 +1,24 @@
+Package: QUEST
+Title: Quantifying Uncertainty for Spatial Domain Detection in Spatial Transcriptomics
+Version: 0.1.0
+Authors@R: 
+    person("Yanlin", "Tong", email = "zoetong@umich.edu", role = c("aut", "cre"))
+Description: QUEST is a computational method for quantifying uncertainty in spatial domain detection using fuzzy clustering. It provides probabilistic domain assignments and location-level uncertainty estimates, enabling refinement of domain detection, identification of ambiguous regions such as domain boundaries and heterogeneous subdomains, and improvement of downstream analyses by focusing on high-confidence locations.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 4.1.0)
+Imports:
+    FNN,
+    ggplot2,
+    igraph,
+    Rcpp,
+    stats,
+    utils,
+    viridis,
+    RColorBrewer
+LazyData: true
+LinkingTo: 
+    Rcpp
