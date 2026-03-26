@@ -17,3 +17,11 @@ You can install the latest development version of QUEST from GitHub:
 ```r
 # install.packages("devtools")
 devtools::install_github("YanlinTong/QUEST")
+
+---
+
+## 📘 Tutorial
+
+This section demonstrates a minimal working example of the QUEST pipeline.
+
+### Step 1: Example data
