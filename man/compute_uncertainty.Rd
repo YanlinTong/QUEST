@@ -13,26 +13,32 @@ compute_uncertainty(
 )
 }
 \arguments{
-\item{u}{A membership matrix (n x k).}
+\item{u}{A numeric matrix of dimension \eqn{n \times k}, where \eqn{n}
+is the number of observations and \eqn{k} is the number of clusters.
+Each row should represent a membership vector.}
 
-\item{normalized}{Logical; whether to return normalized entropy.}
+\item{normalized}{A logical value indicating whether to return normalized entropy.}
 
-\item{threshold_method}{Character; thresholding method. One of
-\code{"mean_sd"} or \code{"quantile"}.}
+\item{threshold_method}{A character string specifying the thresholding method.
+Must be one of \code{"mean_sd"} or \code{"quantile"}.}
 
-\item{threshold_scale}{Numeric; multiplier for SD in the mean-plus-SD
-threshold. Default is 0.5.}
+\item{threshold_scale}{A numeric value specifying the multiplier of the
+standard deviation when \code{threshold_method = "mean_sd"}.}
 
-\item{quantile_prob}{Numeric; quantile probability used when
-\code{threshold_method = "quantile"}. Must be between 0 and 1.}
+\item{quantile_prob}{A numeric value between 0 and 1 specifying the quantile
+probability when \code{threshold_method = "quantile"}. Ignored otherwise.}
 }
 \value{
-A list with components:
+A list containing:
 \itemize{
-\item entropy: Numeric vector of entropy values.
-\item threshold: Threshold used to define uncertainty.
-\item is_uncertain: Logical vector indicating uncertain locations.
-\item threshold_method: Method used.
+\item entropy: A numeric vector of entropy values.
+\item threshold: The threshold for entropy used to define uncertainty.
+\item loc_uncertain: Indices of uncertain observations.
+\item is_uncertain: A logical vector indicating uncertain observations.
+\item threshold_method: The thresholding method used.
+\item threshold_scale: The SD multiplier used when \code{threshold_method = "mean_sd"}.
+\item quantile_prob: The quantile probability used when \code{threshold_method = "quantile"},
+and \code{NULL} otherwise.
 \item normalized: Whether entropy was normalized.
 }
 }

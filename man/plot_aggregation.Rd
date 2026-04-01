@@ -8,7 +8,7 @@ plot_aggregation(
   dat_loc,
   cluster,
   is_uncertain,
-  is_aggregated,
+  is_aggre,
   igraph_cluster = NULL,
   title = "Aggregation",
   color_mode = c("status", "cluster", "igraph"),
@@ -24,38 +24,42 @@ plot_aggregation(
 )
 }
 \arguments{
-\item{dat_loc}{A numeric matrix or data frame of spatial coordinates
-with two columns.}
+\item{dat_loc}{A numeric matrix of dimension \eqn{n \times \rho}, where
+\eqn{n} is the number of observations and \eqn{\rho = 2} corresponds to
+two spatial coordinates.}
 
-\item{cluster}{A vector of cluster labels of length n.}
+\item{cluster}{A vector of length \eqn{n} giving cluster labels.}
 
-\item{is_uncertain}{A logical vector of length n.}
+\item{is_uncertain}{A logical vector of length \eqn{n}.}
 
-\item{is_aggregated}{A logical vector of length n, or a vector of indices of
-aggregated locations.}
+\item{is_aggre}{A logical vector of length \eqn{n}, or a vector of indices
+of aggregated locations.}
 
-\item{igraph_cluster}{Optional vector of ordered igraph cluster labels of
-length n. Non-aggregated locations can be \code{NA}.}
+\item{igraph_cluster}{An optional vector of connected-component labels of length
+\eqn{n}. Non-aggregated locations can be \code{NA}. If \code{color_mode = "igraph"},
+only aggregated locations are displayed.}
 
-\item{title}{Character; facet title.}
+\item{title}{A character string specifying the facet title.}
 
-\item{color_mode}{Character; one of \code{"status"}, \code{"cluster"}, or \code{"igraph"}.}
+\item{color_mode}{A character string specifying the coloring mode.
+Must be one of \code{"status"}, \code{"cluster"}, or \code{"igraph"}.}
 
-\item{palette}{Optional character vector of colors for cluster or igraph labels.}
+\item{palette}{An optional character vector of colors for cluster or igraph labels.}
 
-\item{point_size}{Numeric; point size for background points.}
+\item{point_size}{A numeric value specifying the point size for background points.}
 
-\item{aggre_size}{Numeric; point size for aggregated points when highlighted.}
+\item{aggre_size}{A numeric value specifying the point size for aggregated points
+when highlighted.}
 
-\item{point_alpha}{Numeric; point alpha.}
+\item{point_alpha}{A numeric value specifying the point alpha.}
 
-\item{legend_position}{Character; legend position.}
+\item{legend_position}{A character string specifying the legend position.}
 
-\item{strip_text_size}{Numeric; facet strip text size.}
+\item{strip_text_size}{A numeric value specifying the facet strip text size.}
 
-\item{legend_text_size}{Numeric; legend text size.}
+\item{legend_text_size}{A numeric value specifying the legend text size.}
 
-\item{legend_title_size}{Numeric; legend title size.}
+\item{legend_title_size}{A numeric value specifying the legend title size.}
 
 \item{...}{Additional arguments passed to \code{ggplot2::geom_point()}.}
 }

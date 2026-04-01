@@ -3,60 +3,69 @@
 #' Perform fuzzy c-means clustering with multiple random initializations
 #' and return the best solution based on the final objective value.
 #'
-#' @param x A numeric matrix of observations, with rows representing samples
-#'   and columns representing features.
-#' @param nclus Number of clusters.
-#' @param iter.max Maximum number of iterations for each initialization.
-#' @param verbose Logical; whether to print convergence messages.
-#' @param m Fuzziness parameter. Must be greater than 1.
-#' @param reltol Relative tolerance for convergence.
-#' @param initialnum Number of random initializations.
+#' @param x A numeric matrix of dimension \eqn{n \times d}, where \eqn{n}
+#'   is the number of observations and \eqn{d} is the number of features.
+#' @param nclus An integer specifying the number of clusters.
+#' @param m A numeric value greater than 1 specifying the fuzziness parameter.
+#' @param nstart An integer specifying the number of random initializations.
+#' @param iter_max An integer specifying the maximum number of iterations for each initialization.
+#' @param reltol A numeric value specifying the relative tolerance for convergence.
+#' @param verbose A logical value indicating whether to print convergence messages.
 #'
 #' @return An object of class `"fcmclust"` containing:
 #' \itemize{
 #'   \item nclus: Number of clusters.
 #'   \item m: Fuzziness parameter.
-#'   \item initialnum: Number of random initializations.
+#'   \item nstart: Number of random initializations.
 #'   \item membership: Fuzzy membership matrix.
 #'   \item cluster: Hard cluster labels.
+#'   \item size: Cluster sizes.
 #'   \item centers: Cluster centers.
 #'   \item withinerror: Final objective value.
-#'   \item size: Cluster sizes.
 #'   \item iter: Number of iterations until convergence.
 #'   \item call: Matched function call.
 #' }
 #' @export
 fcmclust <- function(x,
                      nclus,
-                     iter.max = 100,
-                     verbose = TRUE,
                      m = 2,
+                     nstart = 10,
+                     iter_max = 100,
                      reltol = 1e-4,
-                     initialnum = 10) {
+                     verbose = FALSE) {
   x <- as.matrix(x)
 
   if (!is.numeric(x)) {
     stop("x must be a numeric matrix or coercible to a numeric matrix.")
   }
-  if (!is.numeric(nclus) || length(nclus) != 1 || nclus < 2) {
+  if (any(is.na(x))) {
+    stop("x must not contain missing values.")
+  }
+  if (!is.numeric(nclus) || length(nclus) != 1 || is.na(nclus) ||
+      nclus < 2 || nclus != as.integer(nclus)) {
     stop("nclus must be a single integer greater than or equal to 2.")
   }
-  if (!is.numeric(iter.max) || length(iter.max) != 1 || iter.max < 1) {
-    stop("iter.max must be a single positive integer.")
-  }
-  if (!is.numeric(m) || length(m) != 1 || m <= 1) {
+  if (!is.numeric(m) || length(m) != 1 || is.na(m) || m <= 1) {
     stop("m must be a single numeric value greater than 1.")
   }
-  if (!is.numeric(reltol) || length(reltol) != 1 || reltol <= 0) {
+  if (!is.numeric(nstart) || length(nstart) != 1 || is.na(nstart) ||
+      nstart < 1 || nstart != as.integer(nstart)) {
+    stop("nstart must be a single positive integer.")
+  }
+  if (!is.numeric(iter_max) || length(iter_max) != 1 || is.na(iter_max) ||
+      iter_max < 1 || iter_max != as.integer(iter_max)) {
+    stop("iter_max must be a single positive integer.")
+  }
+  if (!is.numeric(reltol) || length(reltol) != 1 || is.na(reltol) || reltol <= 0) {
     stop("reltol must be a single positive numeric value.")
   }
-  if (!is.numeric(initialnum) || length(initialnum) != 1 || initialnum < 1) {
-    stop("initialnum must be a single positive integer.")
+  if (!is.logical(verbose) || length(verbose) != 1 || is.na(verbose)) {
+    stop("verbose must be a single logical value.")
   }
 
   nclus <- as.integer(nclus)
-  iter.max <- as.integer(iter.max)
-  initialnum <- as.integer(initialnum)
+  nstart <- as.integer(nstart)
+  iter_max <- as.integer(iter_max)
 
   xrows <- nrow(x)
 
@@ -71,7 +80,7 @@ fcmclust <- function(x,
   best_cluster <- NULL
   best_size <- NULL
 
-  for (init in seq_len(initialnum)) {
+  for (init in seq_len(nstart)) {
     centers <- x[sample(seq_len(xrows), nclus), , drop = FALSE]
 
     if (any(duplicated(centers))) {
@@ -107,9 +116,9 @@ fcmclust <- function(x,
       old_error <- new_error
       iter <- iter + 1L
 
-      if (iter >= iter.max) {
+      if (iter >= iter_max) {
         if (verbose) {
-          message(sprintf("Reached maximum number of iterations: %d", iter.max))
+          message(sprintf("Reached maximum number of iterations: %d", iter_max))
         }
         break
       }
@@ -128,15 +137,19 @@ fcmclust <- function(x,
     }
   }
 
+
   retval <- list(
     nclus = nclus,
     m = m,
-    initialnum = initialnum,
+    nstart = nstart,
+
     membership = best_u,
     cluster = as.character(best_cluster),
-    centers = best_centers,
-    withinerror = best_error,
     size = best_size,
+    centers = best_centers,
+
+    withinerror = best_error,
+
     iter = best_iter,
     call = match.call()
   )
@@ -153,28 +166,26 @@ fcmclust <- function(x,
 #' @return The input object, invisibly.
 #' @export
 print.fcmclust <- function(x, ...) {
-  cat("Fuzzy c-means clustering with", x$nclus, "clusters\n")
+  cat("Fuzzy c-means clustering with", x$nclus,
+      "clusters and", x$nstart, "initializations\n")
 
-  cat("\nm:\n")
+  cat("\nFuzziness parameter (m):\n")
   print(x$m, ...)
-
-  cat("\nNumber of initializations:\n")
-  print(x$initialnum, ...)
 
   cat("\nMemberships (first 10 data):\n")
   print(utils::head(x$membership, 10), ...)
 
-  cat("\nClosest hard clustering (first 10 data):\n")
+  cat("\nHard cluster labels (first 10 data):\n")
   print(x$cluster[1:min(10, length(x$cluster))], ...)
+
+  cat("\nCluster sizes:\n")
+  print(x$size, ...)
 
   cat("\nCluster centers:\n")
   print(x$centers, ...)
 
-  cat("\nFinal error (within-cluster sum of squares):\n")
+  cat("\nFinal objective value:\n")
   cat(x$withinerror, "\n")
-
-  cat("\nCluster sizes:\n")
-  print(x$size, ...)
 
   cat("\nNumber of iterations until convergence:\n")
   cat(x$iter, "\n")

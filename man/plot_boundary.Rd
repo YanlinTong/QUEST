@@ -13,7 +13,7 @@ plot_boundary(
   color_mode = c("status", "cluster"),
   palette = NULL,
   point_size = 1.45,
-  boundary_size = 2.2,
+  boundary_size = 1.5,
   point_alpha = 1,
   legend_position = "bottom",
   strip_text_size = 16,
@@ -23,39 +23,40 @@ plot_boundary(
 )
 }
 \arguments{
-\item{dat_loc}{A numeric matrix or data frame of spatial coordinates
-with two columns.}
+\item{dat_loc}{A numeric matrix of dimension \eqn{n \times \rho}, where
+\eqn{n} is the number of observations and \eqn{\rho = 2} corresponds to
+two spatial coordinates.}
 
-\item{cluster}{A vector of cluster labels of length n.}
+\item{cluster}{A vector of length \eqn{n} giving cluster labels.}
 
-\item{is_uncertain}{A logical vector of length n.}
+\item{is_uncertain}{A logical vector of length \eqn{n}.}
 
-\item{is_boundary}{A logical vector of length n, or a vector of indices of
-boundary locations.}
+\item{is_boundary}{A logical vector of length \eqn{n}, or a vector of indices
+of boundary locations.}
 
-\item{title}{Character; facet title.}
+\item{title}{A character string specifying the facet title.}
 
-\item{color_mode}{Character; either \code{"status"} or \code{"cluster"}.
-If \code{"status"}, points are colored as certain / uncertain / boundary.
-If \code{"cluster"}, points are colored by cluster label and boundary locations
-are highlighted with a larger outline.}
+\item{color_mode}{A character string specifying the coloring mode.
+Must be one of \code{"status"} or \code{"cluster"}. If \code{"status"}, points are colored
+as certain / uncertain / boundary. If \code{"cluster"}, points are colored by
+cluster label and boundary locations are highlighted with a larger outline.}
 
-\item{palette}{Optional character vector of colors for cluster labels when
+\item{palette}{An optional character vector of colors for cluster labels when
 \code{color_mode = "cluster"}.}
 
-\item{point_size}{Numeric; point size for background points.}
+\item{point_size}{A numeric value specifying the point size for background points.}
 
-\item{boundary_size}{Numeric; point size for boundary points.}
+\item{boundary_size}{A numeric value specifying the point size for boundary points.}
 
-\item{point_alpha}{Numeric; point alpha.}
+\item{point_alpha}{A numeric value specifying the point alpha.}
 
-\item{legend_position}{Character; legend position.}
+\item{legend_position}{A character string specifying the legend position.}
 
-\item{strip_text_size}{Numeric; facet strip text size.}
+\item{strip_text_size}{A numeric value specifying the facet strip text size.}
 
-\item{legend_text_size}{Numeric; legend text size.}
+\item{legend_text_size}{A numeric value specifying the legend text size.}
 
-\item{legend_title_size}{Numeric; legend title size.}
+\item{legend_title_size}{A numeric value specifying the legend title size.}
 
 \item{...}{Additional arguments passed to \code{ggplot2::geom_point()}.}
 }

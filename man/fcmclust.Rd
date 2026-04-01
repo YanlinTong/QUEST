@@ -7,40 +7,40 @@
 fcmclust(
   x,
   nclus,
-  iter.max = 100,
-  verbose = TRUE,
   m = 2,
+  nstart = 10,
+  iter_max = 100,
   reltol = 1e-04,
-  initialnum = 10
+  verbose = FALSE
 )
 }
 \arguments{
-\item{x}{A numeric matrix of observations, with rows representing samples
-and columns representing features.}
+\item{x}{A numeric matrix of dimension \eqn{n \times d}, where \eqn{n}
+is the number of observations and \eqn{d} is the number of features.}
 
-\item{nclus}{Number of clusters.}
+\item{nclus}{An integer specifying the number of clusters.}
 
-\item{iter.max}{Maximum number of iterations for each initialization.}
+\item{m}{A numeric value greater than 1 specifying the fuzziness parameter.}
 
-\item{verbose}{Logical; whether to print convergence messages.}
+\item{nstart}{An integer specifying the number of random initializations.}
 
-\item{m}{Fuzziness parameter. Must be greater than 1.}
+\item{iter_max}{An integer specifying the maximum number of iterations for each initialization.}
 
-\item{reltol}{Relative tolerance for convergence.}
+\item{reltol}{A numeric value specifying the relative tolerance for convergence.}
 
-\item{initialnum}{Number of random initializations.}
+\item{verbose}{A logical value indicating whether to print convergence messages.}
 }
 \value{
 An object of class \code{"fcmclust"} containing:
 \itemize{
 \item nclus: Number of clusters.
 \item m: Fuzziness parameter.
-\item initialnum: Number of random initializations.
+\item nstart: Number of random initializations.
 \item membership: Fuzzy membership matrix.
 \item cluster: Hard cluster labels.
+\item size: Cluster sizes.
 \item centers: Cluster centers.
 \item withinerror: Final objective value.
-\item size: Cluster sizes.
 \item iter: Number of iterations until convergence.
 \item call: Matched function call.
 }

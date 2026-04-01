@@ -20,29 +20,30 @@ plot_clusters(
 )
 }
 \arguments{
-\item{dat_loc}{A numeric matrix or data frame of spatial coordinates
-with two columns.}
+\item{dat_loc}{A numeric matrix of dimension \eqn{n \times \rho}, where
+\eqn{n} is the number of observations and \eqn{\rho = 2} corresponds to
+two spatial coordinates.}
 
-\item{cluster}{A vector of cluster labels of length n.}
+\item{cluster}{A vector of length \eqn{n} giving cluster labels.}
 
-\item{title}{Character; facet title.}
+\item{title}{A character string specifying the facet title.}
 
-\item{palette}{Optional character vector of colors. If NULL, ggplot default
-discrete colors are used.}
+\item{palette}{An optional character vector of colors. If \code{NULL}, ggplot
+default discrete colors are used.}
 
-\item{point_size}{Numeric; point size.}
+\item{point_size}{A numeric value specifying the point size.}
 
-\item{point_alpha}{Numeric; point alpha.}
+\item{point_alpha}{A numeric value specifying the point alpha.}
 
-\item{legend_nrow}{Integer; number of rows in legend.}
+\item{legend_nrow}{An integer specifying the number of rows in the legend.}
 
-\item{legend_position}{Character; legend position.}
+\item{legend_position}{A character string specifying the legend position.}
 
-\item{strip_text_size}{Numeric; facet strip text size.}
+\item{strip_text_size}{A numeric value specifying the facet strip text size.}
 
-\item{legend_text_size}{Numeric; legend text size.}
+\item{legend_text_size}{A numeric value specifying the legend text size.}
 
-\item{legend_title_size}{Numeric; legend title size.}
+\item{legend_title_size}{A numeric value specifying the legend title size.}
 
 \item{...}{Additional arguments passed to \code{ggplot2::geom_point()}.}
 }

@@ -23,49 +23,44 @@ plot_uncertainty(
 )
 }
 \arguments{
-\item{dat_loc}{A numeric matrix or data frame of spatial coordinates
-with two columns.}
+\item{dat_loc}{A numeric matrix of dimension \eqn{n \times \rho}, where
+\eqn{n} is the number of observations and \eqn{\rho = 2} corresponds to
+two spatial coordinates.}
 
-\item{uncertainty}{A numeric vector of uncertainty values of length n.}
+\item{uncertainty}{A numeric vector of length \eqn{n} giving uncertainty values.}
 
-\item{mode}{Character; visualization mode. One of \code{"continuous"} or
-\code{"category"}.}
+\item{mode}{A character string specifying the visualization mode.
+Must be one of \code{"continuous"} or \code{"category"}.}
 
-\item{title}{Character; facet title.}
+\item{title}{A character string specifying the facet title.}
 
-\item{point_size}{Numeric; point size.}
+\item{point_size}{A numeric value specifying the point size.}
 
-\item{point_alpha}{Numeric; point alpha.}
+\item{point_alpha}{A numeric value specifying the point alpha.}
 
-\item{tile_alpha}{Numeric; tile alpha.}
+\item{tile_alpha}{A numeric value specifying the tile alpha.}
 
-\item{add_tile}{Logical; whether to add \code{geom_tile()}.}
+\item{add_tile}{A logical value indicating whether to add \code{geom_tile()}.}
 
-\item{relabel}{Logical; whether to relabel category levels as
+\item{relabel}{A logical value indicating whether to relabel category levels as
 "Certain", "Uncertain (moderate)", "Uncertain (high)", and
 "Uncertain (extreme)" when \code{mode = "category"}.}
 
-\item{legend_position}{Character; legend position.}
+\item{legend_position}{A character string specifying the legend position.}
 
-\item{strip_text_size}{Numeric; facet strip text size.}
+\item{strip_text_size}{A numeric value specifying the facet strip text size.}
 
-\item{legend_text_size}{Numeric; legend text size.}
+\item{legend_text_size}{A numeric value specifying the legend text size.}
 
-\item{legend_title_size}{Numeric; legend title size.}
+\item{legend_title_size}{A numeric value specifying the legend title size.}
 
-\item{legend_nrow}{Integer; number of rows in legend when
+\item{legend_nrow}{An integer specifying the number of rows in the legend when
 \code{mode = "category"}.}
 
 \item{...}{Additional arguments passed to \code{ggplot2::geom_point()}.}
 }
 \value{
-A list with:
-\itemize{
-\item plot: A ggplot object.
-\item uncertainty_value: The input uncertainty vector.
-\item uncertainty_category: A factor of categorized uncertainty values
-when \code{mode = "category"}, otherwise \code{NULL}.
-}
+A ggplot object.
 }
 \description{
 Uncertainty can be displayed either as a continuous variable or as

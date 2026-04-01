@@ -7,39 +7,40 @@
 fcmclust_auto(
   x,
   nclus,
-  iter.max = 100,
-  verbose = TRUE,
   vec_m = seq(from = 1.1, to = 2.5, by = 0.1),
+  nstart = 10,
+  iter_max = 100,
   reltol = 1e-04,
-  initialnum = 10,
+  verbose = FALSE,
   return_all_fits = FALSE
 )
 }
 \arguments{
-\item{x}{A numeric matrix of observations.}
+\item{x}{A numeric matrix of dimension \eqn{n \times d}, where \eqn{n}
+is the number of observations and \eqn{d} is the number of features.}
 
-\item{nclus}{Number of clusters.}
+\item{nclus}{An integer specifying the number of clusters.}
 
-\item{iter.max}{Maximum number of iterations for each initialization.}
+\item{vec_m}{A numeric vector specifying candidate fuzziness parameters.}
 
-\item{verbose}{Logical; whether to print progress.}
+\item{nstart}{An integer specifying the number of random initializations.}
 
-\item{vec_m}{A numeric vector of candidate fuzziness parameters.}
+\item{iter_max}{An integer specifying the maximum number of iterations.}
 
-\item{reltol}{Relative tolerance for convergence.}
+\item{reltol}{A numeric value specifying the relative tolerance for convergence.}
 
-\item{initialnum}{Number of random initializations.}
+\item{verbose}{A logical value indicating whether to print convergence messages.}
 
-\item{return_all_fits}{Logical; whether to return all fitted models over \code{vec_m}.}
+\item{return_all_fits}{A logical value indicating whether to return all fitted models over \code{vec_m}.}
 }
 \value{
-An object of class \code{"fcmclust"} corresponding to the selected
-fuzziness parameter, with additional components:
+An object of class \code{"fcmclust_auto"} (inheriting from \code{"fcmclust"}),
+corresponding to the selected fuzziness parameter, with additional components:
 \itemize{
 \item best_m: The selected fuzziness parameter.
 \item xb: The XB index of the selected solution.
-\item xb_grid: XB index values corresponding to \code{vec_m}.
 \item vec_m: Candidate fuzziness parameters.
+\item xb_grid: XB index values corresponding to \code{vec_m}.
 \item all_fits: A list of fitted models for all candidate values of \code{m}
 if \code{return_all_fits = TRUE}, otherwise \code{NULL}.
 }

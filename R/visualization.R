@@ -1,18 +1,19 @@
 #' Visualize spatial cluster labels
 #'
-#' @param dat_loc A numeric matrix or data frame of spatial coordinates
-#'   with two columns.
-#' @param cluster A vector of cluster labels of length n.
-#' @param title Character; facet title.
-#' @param palette Optional character vector of colors. If NULL, ggplot default
-#'   discrete colors are used.
-#' @param point_size Numeric; point size.
-#' @param point_alpha Numeric; point alpha.
-#' @param legend_nrow Integer; number of rows in legend.
-#' @param legend_position Character; legend position.
-#' @param strip_text_size Numeric; facet strip text size.
-#' @param legend_text_size Numeric; legend text size.
-#' @param legend_title_size Numeric; legend title size.
+#' @param dat_loc A numeric matrix of dimension \eqn{n \times \rho}, where
+#'   \eqn{n} is the number of observations and \eqn{\rho = 2} corresponds to
+#'   two spatial coordinates.
+#' @param cluster A vector of length \eqn{n} giving cluster labels.
+#' @param title A character string specifying the facet title.
+#' @param palette An optional character vector of colors. If `NULL`, ggplot
+#'   default discrete colors are used.
+#' @param point_size A numeric value specifying the point size.
+#' @param point_alpha A numeric value specifying the point alpha.
+#' @param legend_nrow An integer specifying the number of rows in the legend.
+#' @param legend_position A character string specifying the legend position.
+#' @param strip_text_size A numeric value specifying the facet strip text size.
+#' @param legend_text_size A numeric value specifying the legend text size.
+#' @param legend_title_size A numeric value specifying the legend title size.
 #' @param ... Additional arguments passed to `ggplot2::geom_point()`.
 #'
 #' @return A ggplot object.
@@ -32,12 +33,19 @@ plot_clusters <- function(
     ...
 ) {
   dat_loc <- as.data.frame(dat_loc)
+  cluster <- as.vector(cluster)
 
   if (ncol(dat_loc) < 2) {
     stop("dat_loc must have at least two columns.")
   }
+  if (any(is.na(dat_loc))) {
+    stop("dat_loc must not contain missing values.")
+  }
   if (length(cluster) != nrow(dat_loc)) {
     stop("cluster must have length equal to nrow(dat_loc).")
+  }
+  if (any(is.na(cluster))) {
+    stop("cluster must not contain missing values.")
   }
 
   datt <- data.frame(
@@ -49,17 +57,17 @@ plot_clusters <- function(
 
   p <- ggplot2::ggplot(
     datt,
-    ggplot2::aes(x = x, y = y, color = cluster)
+    ggplot2::aes(x = x, y = y, colour = cluster)
   ) +
     ggplot2::geom_point(
-      alpha = point_alpha,
       size = point_size,
+      alpha = point_alpha,
       ...
     ) +
     ggplot2::theme_bw() +
-    ggplot2::labs(x = "", y = "", color = "Cluster") +
+    ggplot2::labs(x = "", y = "", colour = "Cluster") +
     ggplot2::guides(
-      color = ggplot2::guide_legend(
+      colour = ggplot2::guide_legend(
         override.aes = list(size = 5),
         nrow = legend_nrow
       )
@@ -85,39 +93,35 @@ plot_clusters <- function(
   p
 }
 
+
 #' Visualize uncertainty on spatial coordinates
 #'
 #' Uncertainty can be displayed either as a continuous variable or as
 #' categorized levels based on mean and standard deviation thresholds.
 #'
-#' @param dat_loc A numeric matrix or data frame of spatial coordinates
-#'   with two columns.
-#' @param uncertainty A numeric vector of uncertainty values of length n.
-#' @param mode Character; visualization mode. One of `"continuous"` or
-#'   `"category"`.
-#' @param title Character; facet title.
-#' @param point_size Numeric; point size.
-#' @param point_alpha Numeric; point alpha.
-#' @param tile_alpha Numeric; tile alpha.
-#' @param add_tile Logical; whether to add `geom_tile()`.
-#' @param relabel Logical; whether to relabel category levels as
+#' @param dat_loc A numeric matrix of dimension \eqn{n \times \rho}, where
+#'   \eqn{n} is the number of observations and \eqn{\rho = 2} corresponds to
+#'   two spatial coordinates.
+#' @param uncertainty A numeric vector of length \eqn{n} giving uncertainty values.
+#' @param mode A character string specifying the visualization mode.
+#'   Must be one of `"continuous"` or `"category"`.
+#' @param title A character string specifying the facet title.
+#' @param point_size A numeric value specifying the point size.
+#' @param point_alpha A numeric value specifying the point alpha.
+#' @param tile_alpha A numeric value specifying the tile alpha.
+#' @param add_tile A logical value indicating whether to add `geom_tile()`.
+#' @param relabel A logical value indicating whether to relabel category levels as
 #'   "Certain", "Uncertain (moderate)", "Uncertain (high)", and
 #'   "Uncertain (extreme)" when `mode = "category"`.
-#' @param legend_position Character; legend position.
-#' @param strip_text_size Numeric; facet strip text size.
-#' @param legend_text_size Numeric; legend text size.
-#' @param legend_title_size Numeric; legend title size.
-#' @param legend_nrow Integer; number of rows in legend when
+#' @param legend_position A character string specifying the legend position.
+#' @param strip_text_size A numeric value specifying the facet strip text size.
+#' @param legend_text_size A numeric value specifying the legend text size.
+#' @param legend_title_size A numeric value specifying the legend title size.
+#' @param legend_nrow An integer specifying the number of rows in the legend when
 #'   `mode = "category"`.
 #' @param ... Additional arguments passed to `ggplot2::geom_point()`.
 #'
-#' @return A list with:
-#' \itemize{
-#'   \item plot: A ggplot object.
-#'   \item uncertainty_value: The input uncertainty vector.
-#'   \item uncertainty_category: A factor of categorized uncertainty values
-#'     when `mode = "category"`, otherwise `NULL`.
-#' }
+#' @return A ggplot object.
 #' @export
 plot_uncertainty <- function(
     dat_loc,
@@ -142,8 +146,14 @@ plot_uncertainty <- function(
   if (ncol(dat_loc) < 2) {
     stop("dat_loc must have at least two columns.")
   }
+  if (any(is.na(dat_loc))) {
+    stop("dat_loc must not contain missing values.")
+  }
   if (length(uncertainty) != nrow(dat_loc)) {
     stop("uncertainty must have length equal to nrow(dat_loc).")
+  }
+  if (any(is.na(uncertainty))) {
+    stop("uncertainty must not contain missing values.")
   }
 
   datt <- data.frame(
@@ -153,23 +163,28 @@ plot_uncertainty <- function(
     title = title
   )
 
-  uncertainty_category <- NULL
-
   if (mode == "continuous") {
-    p <- ggplot2::ggplot(
-      datt,
-      ggplot2::aes(x = x, y = y, colour = uncertainty)
-    )
+    p <- ggplot2::ggplot(datt, ggplot2::aes(x = x, y = y))
 
     if (add_tile) {
-      p <- p + ggplot2::geom_tile(alpha = tile_alpha)
+      p <- p + ggplot2::geom_tile(
+        ggplot2::aes(fill = uncertainty),
+        alpha = tile_alpha
+      )
     }
 
     p <- p +
       ggplot2::geom_point(
+        ggplot2::aes(colour = uncertainty),
         size = point_size,
         alpha = point_alpha,
         ...
+      ) +
+      ggplot2::scale_fill_viridis_c(
+        option = "A",
+        direction = -1,
+        begin = 0,
+        end = 1
       ) +
       ggplot2::scale_color_viridis_c(
         option = "A",
@@ -178,7 +193,7 @@ plot_uncertainty <- function(
         end = 1
       ) +
       ggplot2::theme_bw() +
-      ggplot2::labs(x = "", y = "", color = "Uncertainty") +
+      ggplot2::labs(x = "", y = "", colour = "Uncertainty", fill = "Uncertainty") +
       ggplot2::theme(
         legend.position = legend_position,
         legend.text = ggplot2::element_text(size = legend_text_size),
@@ -192,9 +207,7 @@ plot_uncertainty <- function(
         panel.grid = ggplot2::element_blank()
       ) +
       ggplot2::facet_grid(. ~ title)
-  }
-
-  if (mode == "category") {
+  } else if (mode == "category") {
     mu <- mean(uncertainty, na.rm = TRUE)
     s <- stats::sd(uncertainty, na.rm = TRUE)
 
@@ -239,29 +252,32 @@ plot_uncertainty <- function(
 
     datt$uncertainty_category <- uncertainty_category
 
-    p <- ggplot2::ggplot(
-      datt,
-      ggplot2::aes(x = x, y = y, colour = uncertainty_category)
-    )
+    p <- ggplot2::ggplot(datt, ggplot2::aes(x = x, y = y))
 
     if (add_tile) {
-      p <- p + ggplot2::geom_tile(alpha = tile_alpha)
+      p <- p + ggplot2::geom_tile(
+        ggplot2::aes(fill = uncertainty_category),
+        alpha = tile_alpha
+      )
     }
 
     p <- p +
       ggplot2::geom_point(
+        ggplot2::aes(colour = uncertainty_category),
         size = point_size,
         alpha = point_alpha,
         ...
       ) +
+      ggplot2::scale_fill_brewer(type = "seq", palette = "YlOrBr") +
       ggplot2::scale_colour_brewer(type = "seq", palette = "YlOrBr") +
       ggplot2::theme_bw() +
-      ggplot2::labs(x = "", y = "", color = "Uncertainty") +
+      ggplot2::labs(x = "", y = "", colour = "Uncertainty", fill = "Uncertainty") +
       ggplot2::guides(
         colour = ggplot2::guide_legend(
           override.aes = list(size = 5, fill = "white", linetype = rep(0, 4)),
           nrow = legend_nrow
-        )
+        ),
+        fill = "none"
       ) +
       ggplot2::theme(
         legend.position = legend_position,
@@ -278,38 +294,33 @@ plot_uncertainty <- function(
       ggplot2::facet_grid(. ~ title)
   }
 
-  list(
-    plot = p,
-    uncertainty_value = uncertainty,
-    uncertainty_category = uncertainty_category
-  )
+  p
 }
-
-
 
 
 #' Visualize boundary uncertain locations
 #'
-#' @param dat_loc A numeric matrix or data frame of spatial coordinates
-#'   with two columns.
-#' @param cluster A vector of cluster labels of length n.
-#' @param is_uncertain A logical vector of length n.
-#' @param is_boundary A logical vector of length n, or a vector of indices of
-#'   boundary locations.
-#' @param title Character; facet title.
-#' @param color_mode Character; either `"status"` or `"cluster"`.
-#'   If `"status"`, points are colored as certain / uncertain / boundary.
-#'   If `"cluster"`, points are colored by cluster label and boundary locations
-#'   are highlighted with a larger outline.
-#' @param palette Optional character vector of colors for cluster labels when
+#' @param dat_loc A numeric matrix of dimension \eqn{n \times \rho}, where
+#'   \eqn{n} is the number of observations and \eqn{\rho = 2} corresponds to
+#'   two spatial coordinates.
+#' @param cluster A vector of length \eqn{n} giving cluster labels.
+#' @param is_uncertain A logical vector of length \eqn{n}.
+#' @param is_boundary A logical vector of length \eqn{n}, or a vector of indices
+#'   of boundary locations.
+#' @param title A character string specifying the facet title.
+#' @param color_mode A character string specifying the coloring mode.
+#'   Must be one of `"status"` or `"cluster"`. If `"status"`, points are colored
+#'   as certain / uncertain / boundary. If `"cluster"`, points are colored by
+#'   cluster label and boundary locations are highlighted with a larger outline.
+#' @param palette An optional character vector of colors for cluster labels when
 #'   `color_mode = "cluster"`.
-#' @param point_size Numeric; point size for background points.
-#' @param boundary_size Numeric; point size for boundary points.
-#' @param point_alpha Numeric; point alpha.
-#' @param legend_position Character; legend position.
-#' @param strip_text_size Numeric; facet strip text size.
-#' @param legend_text_size Numeric; legend text size.
-#' @param legend_title_size Numeric; legend title size.
+#' @param point_size A numeric value specifying the point size for background points.
+#' @param boundary_size A numeric value specifying the point size for boundary points.
+#' @param point_alpha A numeric value specifying the point alpha.
+#' @param legend_position A character string specifying the legend position.
+#' @param strip_text_size A numeric value specifying the facet strip text size.
+#' @param legend_text_size A numeric value specifying the legend text size.
+#' @param legend_title_size A numeric value specifying the legend title size.
 #' @param ... Additional arguments passed to `ggplot2::geom_point()`.
 #'
 #' @return A ggplot object.
@@ -323,7 +334,7 @@ plot_boundary <- function(
     color_mode = c("status", "cluster"),
     palette = NULL,
     point_size = 1.45,
-    boundary_size = 2.2,
+    boundary_size = 1.5,
     point_alpha = 1,
     legend_position = "bottom",
     strip_text_size = 16,
@@ -339,14 +350,24 @@ plot_boundary <- function(
   if (ncol(dat_loc) < 2) {
     stop("dat_loc must have at least two columns.")
   }
+  if (any(is.na(dat_loc))) {
+    stop("dat_loc must not contain missing values.")
+  }
 
   n <- nrow(dat_loc)
 
   if (length(cluster) != n) {
     stop("cluster must have length equal to nrow(dat_loc).")
   }
+  if (any(is.na(cluster))) {
+    stop("cluster must not contain missing values.")
+  }
+
   if (length(is_uncertain) != n) {
     stop("is_uncertain must have length equal to nrow(dat_loc).")
+  }
+  if (any(is.na(is_uncertain))) {
+    stop("is_uncertain must not contain missing values.")
   }
 
   is_boundary_full <- rep(FALSE, n)
@@ -354,9 +375,16 @@ plot_boundary <- function(
     if (length(is_boundary) != n) {
       stop("Logical is_boundary must have length equal to nrow(dat_loc).")
     }
+    if (any(is.na(is_boundary))) {
+      stop("Logical is_boundary must not contain missing values.")
+    }
     is_boundary_full <- is_boundary
   } else {
-    is_boundary_full[as.integer(is_boundary)] <- TRUE
+    idx <- as.integer(is_boundary)
+    if (any(is.na(idx)) || any(idx < 1 | idx > n)) {
+      stop("Index-based is_boundary must contain integers between 1 and nrow(dat_loc).")
+    }
+    is_boundary_full[idx] <- TRUE
   }
 
   datt <- data.frame(
@@ -392,7 +420,8 @@ plot_boundary <- function(
           "Uncertain" = "steelblue",
           "Boundary" = "red"
         )
-      )
+      ) +
+      ggplot2::labs(x = "", y = "", colour = "Status")
   } else {
     p <- ggplot2::ggplot(
       datt,
@@ -409,7 +438,8 @@ plot_boundary <- function(
         size = boundary_size,
         stroke = 1.1,
         colour = "black"
-      )
+      ) +
+      ggplot2::labs(x = "", y = "", colour = "Cluster")
 
     if (!is.null(palette)) {
       p <- p + ggplot2::scale_color_manual(values = palette)
@@ -418,7 +448,6 @@ plot_boundary <- function(
 
   p <- p +
     ggplot2::theme_bw() +
-    ggplot2::labs(x = "", y = "", color = "") +
     ggplot2::theme(
       legend.position = legend_position,
       legend.text = ggplot2::element_text(size = legend_text_size),
@@ -437,28 +466,30 @@ plot_boundary <- function(
 }
 
 
-
-
 #' Visualize aggregated uncertain locations
 #'
-#' @param dat_loc A numeric matrix or data frame of spatial coordinates
-#'   with two columns.
-#' @param cluster A vector of cluster labels of length n.
-#' @param is_uncertain A logical vector of length n.
-#' @param is_aggregated A logical vector of length n, or a vector of indices of
-#'   aggregated locations.
-#' @param igraph_cluster Optional vector of ordered igraph cluster labels of
-#'   length n. Non-aggregated locations can be `NA`.
-#' @param title Character; facet title.
-#' @param color_mode Character; one of `"status"`, `"cluster"`, or `"igraph"`.
-#' @param palette Optional character vector of colors for cluster or igraph labels.
-#' @param point_size Numeric; point size for background points.
-#' @param aggre_size Numeric; point size for aggregated points when highlighted.
-#' @param point_alpha Numeric; point alpha.
-#' @param legend_position Character; legend position.
-#' @param strip_text_size Numeric; facet strip text size.
-#' @param legend_text_size Numeric; legend text size.
-#' @param legend_title_size Numeric; legend title size.
+#' @param dat_loc A numeric matrix of dimension \eqn{n \times \rho}, where
+#'   \eqn{n} is the number of observations and \eqn{\rho = 2} corresponds to
+#'   two spatial coordinates.
+#' @param cluster A vector of length \eqn{n} giving cluster labels.
+#' @param is_uncertain A logical vector of length \eqn{n}.
+#' @param is_aggre A logical vector of length \eqn{n}, or a vector of indices
+#'   of aggregated locations.
+#' @param igraph_cluster An optional vector of connected-component labels of length
+#'   \eqn{n}. Non-aggregated locations can be `NA`. If `color_mode = "igraph"`,
+#'   only aggregated locations are displayed.
+#' @param title A character string specifying the facet title.
+#' @param color_mode A character string specifying the coloring mode.
+#'   Must be one of `"status"`, `"cluster"`, or `"igraph"`.
+#' @param palette An optional character vector of colors for cluster or igraph labels.
+#' @param point_size A numeric value specifying the point size for background points.
+#' @param aggre_size A numeric value specifying the point size for aggregated points
+#'   when highlighted.
+#' @param point_alpha A numeric value specifying the point alpha.
+#' @param legend_position A character string specifying the legend position.
+#' @param strip_text_size A numeric value specifying the facet strip text size.
+#' @param legend_text_size A numeric value specifying the legend text size.
+#' @param legend_title_size A numeric value specifying the legend title size.
 #' @param ... Additional arguments passed to `ggplot2::geom_point()`.
 #'
 #' @return A ggplot object.
@@ -467,7 +498,7 @@ plot_aggregation <- function(
     dat_loc,
     cluster,
     is_uncertain,
-    is_aggregated,
+    is_aggre,
     igraph_cluster = NULL,
     title = "Aggregation",
     color_mode = c("status", "cluster", "igraph"),
@@ -489,24 +520,41 @@ plot_aggregation <- function(
   if (ncol(dat_loc) < 2) {
     stop("dat_loc must have at least two columns.")
   }
+  if (any(is.na(dat_loc))) {
+    stop("dat_loc must not contain missing values.")
+  }
 
   n <- nrow(dat_loc)
 
   if (length(cluster) != n) {
     stop("cluster must have length equal to nrow(dat_loc).")
   }
+  if (any(is.na(cluster))) {
+    stop("cluster must not contain missing values.")
+  }
+
   if (length(is_uncertain) != n) {
     stop("is_uncertain must have length equal to nrow(dat_loc).")
   }
+  if (any(is.na(is_uncertain))) {
+    stop("is_uncertain must not contain missing values.")
+  }
 
-  is_aggregated_full <- rep(FALSE, n)
-  if (is.logical(is_aggregated)) {
-    if (length(is_aggregated) != n) {
-      stop("Logical is_aggregated must have length equal to nrow(dat_loc).")
+  is_aggre_full <- rep(FALSE, n)
+  if (is.logical(is_aggre)) {
+    if (length(is_aggre) != n) {
+      stop("Logical is_aggre must have length equal to nrow(dat_loc).")
     }
-    is_aggregated_full <- is_aggregated
+    if (any(is.na(is_aggre))) {
+      stop("Logical is_aggre must not contain missing values.")
+    }
+    is_aggre_full <- is_aggre
   } else {
-    is_aggregated_full[as.integer(is_aggregated)] <- TRUE
+    idx <- as.integer(is_aggre)
+    if (any(is.na(idx)) || any(idx < 1 | idx > n)) {
+      stop("Index-based is_aggre must contain integers between 1 and nrow(dat_loc).")
+    }
+    is_aggre_full[idx] <- TRUE
   }
 
   if (color_mode == "igraph") {
@@ -518,18 +566,22 @@ plot_aggregation <- function(
     }
   }
 
+  if (!is.null(igraph_cluster) && any(is.na(igraph_cluster[is_aggre_full]))) {
+    stop("Aggregated locations must have non-missing igraph_cluster labels.")
+  }
+
   datt <- data.frame(
     x = dat_loc[[1]],
     y = dat_loc[[2]],
     cluster = factor(cluster),
     is_uncertain = is_uncertain,
-    is_aggregated = is_aggregated_full,
+    is_aggre = is_aggre_full,
     title = title
   )
 
   datt$status <- "Certain"
   datt$status[datt$is_uncertain] <- "Uncertain"
-  datt$status[datt$is_aggregated] <- "Aggregation"
+  datt$status[datt$is_aggre] <- "Aggregation"
   datt$status <- factor(
     datt$status,
     levels = c("Certain", "Uncertain", "Aggregation")
@@ -555,7 +607,8 @@ plot_aggregation <- function(
           "Uncertain" = "steelblue",
           "Aggregation" = "red"
         )
-      )
+      ) +
+      ggplot2::labs(x = "", y = "", colour = "Status")
   } else if (color_mode == "cluster") {
     p <- ggplot2::ggplot(
       datt,
@@ -567,26 +620,28 @@ plot_aggregation <- function(
         ...
       ) +
       ggplot2::geom_point(
-        data = datt[datt$is_aggregated, , drop = FALSE],
+        data = datt[datt$is_aggre, , drop = FALSE],
         shape = 1,
         size = aggre_size,
         stroke = 1.1,
         colour = "black"
-      )
+      ) +
+      ggplot2::labs(x = "", y = "", colour = "Cluster")
 
     if (!is.null(palette)) {
       p <- p + ggplot2::scale_color_manual(values = palette)
     }
   } else {
     p <- ggplot2::ggplot(
-      datt[datt$is_aggregated, , drop = FALSE],
+      datt[datt$is_aggre, , drop = FALSE],
       ggplot2::aes(x = x, y = y, colour = igraph_cluster)
     ) +
       ggplot2::geom_point(
         size = point_size,
         alpha = point_alpha,
         ...
-      )
+      ) +
+      ggplot2::labs(x = "", y = "", colour = "Aggregation cluster")
 
     if (!is.null(palette)) {
       p <- p + ggplot2::scale_color_manual(values = palette)
@@ -595,7 +650,6 @@ plot_aggregation <- function(
 
   p <- p +
     ggplot2::theme_bw() +
-    ggplot2::labs(x = "", y = "", color = "") +
     ggplot2::theme(
       legend.position = legend_position,
       legend.text = ggplot2::element_text(size = legend_text_size),

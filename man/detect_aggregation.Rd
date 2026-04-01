@@ -7,76 +7,74 @@
 detect_aggregation(
   dat_loc,
   is_uncertain,
-  k,
+  n_neighbors,
   threshold_count = NULL,
   threshold_prop = NULL,
   add_high_uncertain_step1 = FALSE,
   high_uncertain = NULL,
   do_step2 = TRUE,
-  distance_threshold,
-  min_component_size = 300
+  distance_threshold = NULL,
+  min_component_size = NULL
 )
 }
 \arguments{
-\item{dat_loc}{A numeric matrix or data frame of spatial coordinates
-(n x d), where rows correspond to observations.}
+\item{dat_loc}{A numeric matrix of dimension \eqn{n \times \rho}, where \eqn{n}
+is the number of observations and \eqn{\rho} is the spatial coordinate dimension
+(for example, \eqn{\rho = 2} for 2D coordinates).
+Each row corresponds to one observation.}
 
-\item{is_uncertain}{A logical vector of length n indicating whether each
-observation is uncertain.}
+\item{is_uncertain}{A logical vector of length \eqn{n} indicating whether
+each observation is uncertain.}
 
-\item{k}{Integer; number of nearest neighbors to use.}
+\item{n_neighbors}{An integer specifying the number of nearest neighbors.}
 
-\item{threshold_count}{Integer; minimum number of uncertain neighbors among
-the k nearest neighbors required in Step 1. If provided, this takes
-precedence over \code{threshold_prop}.}
+\item{threshold_count}{An integer specifying the minimum number of uncertain
+neighbors required in Step 1. If provided, this takes precedence over
+\code{threshold_prop}.}
 
-\item{threshold_prop}{Numeric between 0 and 1; minimum proportion of uncertain
-neighbors among the k nearest neighbors required in Step 1. Used only when
+\item{threshold_prop}{A numeric value between 0 and 1 specifying the minimum
+proportion of uncertain neighbors required in Step 1. Used only when
 \code{threshold_count = NULL}.}
 
-\item{add_high_uncertain_step1}{Logical; whether to forcibly add highly
-uncertain locations in Step 1.}
+\item{add_high_uncertain_step1}{A logical value indicating whether to forcibly
+add highly uncertain locations in Step 1.}
 
-\item{high_uncertain}{Either a logical vector of length n or an integer vector
-of indices specifying highly uncertain locations to be added in Step 1 when
-\code{add_high_uncertain_step1 = TRUE}.}
+\item{high_uncertain}{Either a logical vector of length \eqn{n} or an integer
+vector of indices specifying highly uncertain locations to be added in Step 1
+when \code{add_high_uncertain_step1 = TRUE}.}
 
-\item{do_step2}{Logical; whether to expand aggregation locations by adding
-uncertain neighbors of the Step 1 aggregation locations.}
+\item{do_step2}{A logical value indicating whether to expand aggregation
+locations by adding uncertain neighbors of the Step 1 aggregation locations.}
 
-\item{distance_threshold}{Numeric; distance threshold used to define graph
-connectivity in Step 3.}
+\item{distance_threshold}{A positive numeric value specifying the distance
+threshold used to define graph connectivity in Step 3. If \code{NULL}, it is
+automatically set to 1.1 times the median nearest-neighbor distance.}
 
-\item{min_component_size}{Integer; minimum connected component size to keep
-in Step 3.}
+\item{min_component_size}{An integer specifying the minimum connected component
+size to keep in Step 3. If \code{NULL}, it is automatically set to
+\code{floor(0.003 * nrow(dat_loc))}.}
 }
 \value{
 A list containing:
 \itemize{
 \item loc_aggre: Indices of final aggregation locations.
-\item is_aggregated: Logical vector of length n indicating aggregation status.
-\item igraph_cluster: Integer vector of length n giving reordered igraph
+\item is_aggre: A logical vector of length \eqn{n} indicating uncertain aggregation status.
+\item aggre_cluster: An integer vector of length \eqn{n} giving reordered igraph
 component labels for final aggregation locations, and \code{NA} otherwise.
-\item igraph_cluster_aggre: Reordered igraph component labels only for final
-aggregation locations.
 \item loc_uncertain: Indices of uncertain locations.
 \item loc_certain: Indices of certain locations.
-\item loc_aggre_step1: Aggregation indices after Step 1.
-\item loc_aggre_step2: Aggregation indices after Step 2.
-\item neighbor_uncertain_counts: Number of uncertain neighbors for each
-uncertain location in Step 1.
-\item threshold_count: Final count threshold used in Step 1.
 \item n_aggre: Number of final aggregation locations.
 \item prop_aggre_in_uncertain: Proportion of final aggregation locations
 among uncertain locations.
 }
 }
 \description{
-Identify aggregation locations among uncertain observations using a
+Identify aggregated locations among uncertain observations using a
 three-step procedure:
 \itemize{
 \item Step 1: Select uncertain locations with at least a specified number
-(or proportion) of uncertain neighbors among their k nearest neighbors.
+(or proportion) of uncertain neighbors among their \eqn{n\_neighbors}
+nearest neighbors.
 \item Step 2: Expand the aggregation set by adding uncertain neighbors of
 the Step 1 aggregation locations.
 \item Step 3: Build an igraph connectivity graph on the Step 2 aggregation

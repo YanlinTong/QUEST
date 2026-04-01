@@ -4,25 +4,25 @@
 \alias{detect_boundary}
 \title{Detect boundary uncertain locations}
 \usage{
-detect_boundary(dat_loc, cluster, is_uncertain, k)
+detect_boundary(dat_loc, cluster, is_uncertain, n_neighbors)
 }
 \arguments{
-\item{dat_loc}{A numeric matrix or data frame of spatial coordinates
-(n x d), where rows correspond to observations.}
+\item{dat_loc}{A numeric matrix of dimension \eqn{n \times d}, where \eqn{n}
+is the number of observations and \eqn{d} is the number of spatial coordinates.
+Each row corresponds to one observation.}
 
-\item{cluster}{A vector of hard cluster labels of length n.}
+\item{cluster}{A vector of length \eqn{n} giving hard cluster labels.}
 
-\item{is_uncertain}{A logical vector of length n indicating whether each
-observation is uncertain.}
+\item{is_uncertain}{A logical vector of length \eqn{n} indicating whether
+each observation is uncertain.}
 
-\item{k}{Integer; number of nearest neighbors to use.}
+\item{n_neighbors}{An integer specifying the number of nearest neighbors.}
 }
 \value{
 A list containing:
 \itemize{
 \item loc_boundary: Indices of boundary uncertain locations.
-\item is_boundary: Logical vector of length equal to the number of uncertain
-locations, indicating whether each uncertain location is a boundary.
+\item is_boundary: A logical vector of length \eqn{n} indicating uncertain boundary status.
 \item loc_uncertain: Indices of uncertain locations.
 \item loc_certain: Indices of certain locations.
 \item n_boundary: Number of boundary uncertain locations.
@@ -35,8 +35,8 @@ Identify boundary locations among uncertain observations based on spatial
 nearest neighbors. An uncertain location is defined as a boundary location
 if:
 \itemize{
-\item it has at least one certain location among its k nearest neighbors;
-\item its k nearest neighbors contain at least two distinct cluster labels; and
-\item its own cluster label is represented among its k nearest neighbors.
+\item it has at least one certain location among its \eqn{n_neighbors} nearest neighbors;
+\item its \eqn{n_neighbors} nearest neighbors contain at least two distinct cluster labels; and
+\item its own cluster label is represented among its \eqn{n_neighbors} nearest neighbors.
 }
 }

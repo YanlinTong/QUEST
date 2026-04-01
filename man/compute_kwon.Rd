@@ -7,18 +7,23 @@
 compute_kwon(x, u, v, m = 2)
 }
 \arguments{
-\item{x}{A numeric matrix of observations.}
+\item{x}{A numeric matrix of dimension \eqn{n \times d}, where \eqn{n}
+is the number of observations and \eqn{d} is the number of features.}
 
-\item{u}{Membership matrix.}
+\item{u}{A numeric matrix of dimension \eqn{n \times k}, where \eqn{n}
+is the number of observations and \eqn{k} is the number of clusters.
+Each row should represent a membership vector.}
 
-\item{v}{Cluster centers.}
+\item{v}{A numeric matrix of dimension \eqn{k \times d}, where \eqn{k}
+is the number of clusters and \eqn{d} is the number of features.
+Each row should represent a cluster center.}
 
-\item{m}{Fuzziness parameter.}
+\item{m}{A numeric value greater than 1 specifying the fuzziness parameter.}
 }
 \value{
 A numeric value representing the Kwon index.
 }
 \description{
-Compute the Kwon cluster validity index from data, membership matrix,
+Compute the Kwon cluster validity index from data, a membership matrix,
 and cluster centers.
 }
