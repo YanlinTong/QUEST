@@ -6,10 +6,30 @@
 \alias{QUEST-package}
 \title{QUEST: Quantifying Uncertainty for Spatial Domain Detection in Spatial Transcriptomics}
 \description{
-QUEST is a computational method for quantifying uncertainty in spatial domain detection using fuzzy clustering. It provides probabilistic domain assignments and location-level uncertainty estimates, enabling refinement of domain detection, identification of ambiguous regions such as domain boundaries and heterogeneous subdomains, and improvement of downstream analyses by focusing on high-confidence locations.
+QUEST is a computational method for quantifying uncertainty in spatial domain detection for spatial transcriptomics. By leveraging fuzzy clustering, QUEST generates probabilistic domain assignments and location-level uncertainty estimates, enabling the separation of confidently assigned locations from ambiguous ones. Building on this uncertainty quantification framework, QUEST facilitates the identification of novel tissue structures, including transitional boundaries and heterogeneous subdomains, improves the accuracy of downstream analyses by prioritizing high-confidence locations, and helps guide the determination of the number of spatial domains.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://yanlintong.github.io/QUEST/}
+  \item \url{https://github.com/YanlinTong/QUEST}
+  \item Report bugs at \url{https://github.com/YanlinTong/QUEST/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Yanlin Tong \email{zoetong@umich.edu}
+
+Authors:
+\itemize{
+  \item Xiang Zhou
+}
+
+Other contributors:
+\itemize{
+  \item Xiaoquan Wen [contributor]
+  \item Jiandie Lin [contributor]
+}
 
 }
 \keyword{internal}

@@ -137,16 +137,13 @@ print.fcmclust_auto <- function(x, ...) {
   cat("\nXB index:\n")
   print(x$xb, ...)
 
-  cat("\nCandidate m values:\n")
-  print(x$vec_m, ...)
-
-  cat("\nXB index over candidate m (first 10):\n")
+  cat("\nXB index over candidate m (first 5):\n")
   print(data.frame(
-    m = utils::head(x$vec_m, 10),
-    xb = utils::head(x$xb_grid, 10)
+    m = utils::head(x$vec_m, 5),
+    xb = utils::head(x$xb_grid, 5)
   ), row.names = FALSE, ...)
 
-  if (length(x$xb_grid) > 10) {
+  if (length(x$xb_grid) > 5) {
     cat("... (truncated, use $xb_grid to view all values)\n")
   }
 

@@ -13,13 +13,14 @@ plot_aggregation(
   title = "Aggregation",
   color_mode = c("status", "cluster", "igraph"),
   palette = NULL,
-  point_size = 1.45,
+  point_size = 1.5,
   aggre_size = 2.2,
   point_alpha = 1,
   legend_position = "bottom",
   strip_text_size = 16,
   legend_text_size = 12,
   legend_title_size = 12,
+  background_color = "grey85",
   ...
 )
 }

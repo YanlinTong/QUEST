@@ -1,0 +1,385 @@
+---
+title: "QUEST Tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{QUEST Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Overview
+
+This tutorial presents a complete example analysis using **QUEST** on a Stereo-seq spatial transcriptomics data of the mouse embryo (E9.5).
+
+Before running this tutorial, please make sure that the **QUEST** package has been installed. Detailed installation instructions are provided on the *Installation* page of the package website.
+
+QUEST can be applied in two complementary ways:
+
+1. a **step-by-step workflow**, including fuzzy clustering, uncertainty quantification, boundary detection, aggregation detection, and visualization; and  
+2. a **one-step workflow** using the wrapper function `quest()`, which integrates all analysis steps into a unified pipeline.
+
+The goal of this tutorial is not only to demonstrate the mechanics of the package, but also to illustrate how uncertainty quantification can provide additional insights beyond conventional hard clustering.
+
+# Load package
+
+We first load the required package.
+
+```{r setup, message=FALSE, warning=FALSE}
+# devtools::install_github("YanlinTong/QUEST")
+library(QUEST)
+library(Matrix)
+```
+
+# Load data
+
+We next load the example dataset used throughout this tutorial, including the count matrix and spatial coordinates.
+
+The example data can be downloaded from the following link:
+
+[Download example data](https://drive.google.com/drive/folders/1R24p7JyRCNFKlD-23BXrBak1mmeLPvtn)
+
+After downloading, please place the files under the following directory:
+
+`data/StereoSeq_Embryo95/`
+
+```{r warning=FALSE}
+load("../data/StereoSeq_Embryo95/dat_combined.RData")
+```
+
+## Count matrix
+
+The count matrix represents gene expression measurements across spatial locations, where rows correspond to genes and columns correspond to spatial locations.
+
+```{r}
+print(dat_cnt[1:3, 1:3])
+```
+
+## Spatial coordinates
+
+The spatial coordinate matrix specifies the physical positions of each spatial location in the tissue, with each row representing one location.
+
+```{r}
+print(dat_loc[1:3, ])
+```
+
+# Dimension reduction
+
+QUEST operates on low-dimensional embeddings obtained from upstream methods. In general, we use spatially aware principal components (Spatial PCs).
+
+The following code illustrates how these Spatial PCs can be generated using **SpatialPCA**.
+
+```{r eval=FALSE}
+# ST <- CreateSpatialPCAObject(
+#   counts = dat_cnt,
+#   location = dat_loc,
+#   project = "SpatialPCA",
+#   gene.type = "spatial",
+#   sparkversion = "sparkx",
+#   numCores_spark = 5,
+#   gene.number = 3000,
+#   min.loctions = 20,
+#   min.features = 20
+# )
+# 
+# ST <- SpatialPCA_buildKernel(
+#   ST,
+#   kerneltype = "gaussian",
+#   bandwidthtype = "SJ",
+#   bandwidth.set.by.user = NULL
+# )
+# 
+# ST <- SpatialPCA_EstimateLoading(
+#   ST,
+#   fast = FALSE,
+#   SpatialPCnum = 20
+# )
+# 
+# ST <- SpatialPCA_SpatialPCs(ST, fast = FALSE)
+```
+
+The Spatial PCs used in this tutorial can be directly downloaded from the same data [link](https://drive.google.com/drive/folders/1R24p7JyRCNFKlD-23BXrBak1mmeLPvtn), so they do not need to be recomputed.
+
+```{r}
+load("../data/StereoSeq_Embryo95/pc.RData")
+```
+
+The Spatial PCs matrix has the following dimensions, with rows representing spatial locations and columns representing principal components.
+
+```{r}
+dim(pc)
+```
+
+A subset of the matrix is shown below for illustration.
+
+```{r}
+print(pc[1:3, 1:3])
+```
+
+# Run QUEST step by step
+
+## Step 1: Fuzzy clustering with automatic fuzziness selection
+
+We first perform fuzzy c-means clustering and automatically select the fuzziness parameter $m$ from a candidate grid using the XB index. This provides a flexible clustering framework while allowing the degree of fuzziness to be data-adaptive.
+
+### Main inputs of `fcmclust_auto()`
+
+The most important inputs are:
+
+- `x`: a numeric matrix of dimension \(n \times d\), where rows correspond to spatial locations and columns correspond to features;
+- `nclus`: the number of clusters;
+- `vec_m`: a numeric vector of candidate fuzziness parameters;
+- `nstart`: the number of random initializations;
+- `iter_max`: the maximum number of iterations for each initialization.
+
+```{r fcm_auto, cache=TRUE}
+set.seed(2)
+obj_fcm <- fcmclust_auto(
+  x = pc,
+  nclus = 12,
+  vec_m = seq(from = 1.1, to = 2.0, by = 0.1),
+  nstart = 50,
+  iter_max = 100,
+  verbose = FALSE
+)
+```
+
+The fitted clustering object can be inspected as follows. The output contains the selected fuzziness parameter, membership matrix, hard cluster labels, cluster sizes, and additional model information.
+
+```{r}
+print(obj_fcm)
+```
+
+## Step 2: Uncertainty quantification
+
+QUEST computes entropy-based uncertainty from the fuzzy membership matrix, yielding a location-level measure of clustering ambiguity. Larger entropy values indicate less confident assignments.
+
+### Main inputs of `compute_uncertainty()`
+
+The most important inputs are:
+
+- `u`: the fuzzy membership matrix returned by fuzzy clustering.
+
+- `normalized`: a logical value indicating whether the entropy is normalized to the range \([0, 1]\).  
+  By default, entropy is normalized, which facilitates interpretation and comparability across datasets.
+
+- `threshold_method`: a character string specifying the method used to define uncertain locations.  
+  The default is `"mean_sd"`, which defines uncertainty based on the mean and standard deviation of the entropy distribution.  
+  Alternatively, `"quantile"` can be used to define uncertainty based on a specified quantile.
+
+- `threshold_scale`: a numeric value controlling the threshold when `threshold_method = "mean_sd"`.  
+  By default, uncertain locations are defined as those with entropy greater than  
+  \[
+  \text{mean}(\text{entropy}) + 0.5 \times \text{sd}(\text{entropy}).
+  \]
+  That is, locations with entropy substantially higher than the threshold are classified as uncertain.
+
+```{r uncertainty, cache=TRUE}
+res_uncer <- compute_uncertainty(
+  u = obj_fcm$membership
+)
+```
+
+## Step 3: Boundary detection
+
+We next identify boundary uncertain locations based on spatial neighborhood structure. An uncertain location is classified as a boundary if its neighboring locations contain multiple distinct cluster labels, including its own label, and include at least one certain location.
+
+### Main inputs of `detect_boundary()`
+
+The most important inputs are:
+
+- `dat_loc`: spatial coordinates;
+- `cluster`: hard cluster labels from fuzzy clustering;
+- `is_uncertain`: a logical vector indicating uncertain locations;
+- `n_neighbors`: the number of nearest neighbors used in boundary detection.
+
+```{r boundary, cache=TRUE}
+res_boundary <- detect_boundary(
+  dat_loc = dat_loc,
+  cluster = obj_fcm$cluster,
+  is_uncertain = res_uncer$is_uncertain,
+  n_neighbors = 8
+)
+```
+
+## Step 4: Aggregation detection
+
+We then identify aggregated uncertain locations based on spatial neighborhood structure. An uncertain location is classified as aggregated if a substantial proportion of its neighboring locations are also uncertain.
+
+### Main inputs of `detect_aggregation()`
+
+The most important inputs are:
+
+- `dat_loc`: spatial coordinates;
+- `is_uncertain`: a logical vector indicating uncertain locations;
+- `n_neighbors`: the number of nearest neighbors used in aggregation detection;
+- `distance_threshold`: the distance threshold used to construct the connectivity graph;
+- `min_component_size`: the minimum connected component size retained as an aggregated region.
+
+```{r aggregation, cache=TRUE}
+res_aggre <- detect_aggregation(
+  dat_loc = dat_loc,
+  is_uncertain = res_uncer$is_uncertain,
+  n_neighbors = 8,
+  distance_threshold = 1.1,
+  min_component_size = 20
+)
+```
+
+## Step 5: Visualization
+
+### Cluster labels
+
+We first visualize the inferred cluster labels from QUEST to examine the overall spatial domain structure. Each point corresponds to a spatial location and is colored according to its assigned cluster.
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+plot_clusters(
+  dat_loc = dat_loc,
+  cluster = obj_fcm$cluster,
+  title = "QUEST clusters",
+  palette = c(
+    "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854", "#FFD92F",
+    "#E5C494", "#B3B3B3", "#1B9E77", "#D95F02", "#7570B3", "#E7298A"
+  )
+)
+```
+
+### Categorical uncertainty
+
+We next visualize the uncertainty of each spatial location as a categorical variable. This representation facilitates the identification of highly ambiguous regions and provides a concise summary of spatial uncertainty patterns.
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+plot_uncertainty(
+  dat_loc = dat_loc,
+  uncertainty = res_uncer$entropy,
+  mode = "category",
+  title = "Uncertainty"
+)
+```
+
+### Boundary uncertain locations
+
+We then visualize boundary uncertain locations. These highlighted locations reveal transitional regions between spatial domains and provide a more refined characterization of domain interfaces than hard clustering alone.
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+plot_boundary(
+  dat_loc = dat_loc,
+  cluster = obj_fcm$cluster,
+  is_uncertain = res_uncer$is_uncertain,
+  is_boundary = res_boundary$is_boundary,
+  title = "Boundary uncertain locations",
+  color_mode = "cluster",
+  palette = c(
+    "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854", "#FFD92F",
+    "#E5C494", "#B3B3B3", "#1B9E77", "#D95F02", "#7570B3", "#E7298A"
+  )
+)
+```
+
+### Aggregated uncertain locations
+
+Finally, we visualize aggregated uncertain locations. These aggregated regions reveal spatially connected clusters of uncertainty, highlighting areas of structural complexity or heterogeneity that are not well captured by hard clustering alone.
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+plot_aggregation(
+  dat_loc = dat_loc,
+  cluster = obj_fcm$cluster,
+  is_uncertain = res_uncer$is_uncertain,
+  is_aggre = res_aggre$is_aggre,
+  igraph_cluster = res_aggre$aggre_cluster,
+  title = "Aggregated uncertain locations",
+  color_mode = "igraph"
+)
+```
+
+# Run QUEST in one step
+
+For convenience, the entire workflow can also be performed using the wrapper function `quest()`. This function integrates clustering, uncertainty quantification, optional boundary and aggregation detection, and optional plotting. This is useful when a compact end-to-end analysis is desired.
+
+### Main inputs of `quest()`
+
+The most important inputs are:
+
+- `x`: low-dimensional embedding matrix;
+- `dat_loc`: spatial coordinates;
+- `nclus`: number of clusters;
+- `vec_m`: candidate fuzziness parameters when automatic selection is used;
+- `boundary_n_neighbors`: number of nearest neighbors used for boundary detection;
+- `aggregation_n_neighbors`: number of nearest neighbors used for aggregation detection;
+- `aggregation_distance_threshold`: graph distance threshold for aggregation detection;
+- `aggregation_min_component_size`: minimum connected component size for aggregation detection;
+- `make_plots`: whether to generate default plots.
+
+```{r quest, cache=TRUE}
+set.seed(2)
+res_quest <- quest(
+  x = pc,
+  dat_loc = dat_loc,
+  nclus = 12,
+  vec_m = seq(from = 1.1, to = 2.0, by = 0.1),    
+  nstart = 50,
+  boundary_n_neighbors = 8,
+  aggregation_n_neighbors = 8,
+  aggregation_distance_threshold = 1.1,
+  aggregation_min_component_size = 20,
+  make_plots = TRUE
+)
+```
+
+## Access results
+
+The output from `quest()` contains the clustering results, uncertainty estimates, optional boundary and aggregation results, and a set of default visualizations.
+
+```{r}
+names(res_quest)
+```
+
+## Visualization outputs
+
+The plots generated by `quest(make_plots = TRUE)` are intended for quick visualization. For publication-quality figures, users are encouraged to call the plotting functions directly and customize graphical parameters.
+
+This plot shows the inferred spatial domains obtained from QUEST.  
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+res_quest$plots$clusters
+```
+
+This plot visualizes the uncertainty at each spatial location as a continuous measure.
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+res_quest$plots$uncertainty_continuous
+```
+
+This plot presents uncertainty in a categorical form.
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+res_quest$plots$uncertainty_category
+```
+
+This plot highlights boundary uncertain locations identified by QUEST.
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+res_quest$plots$boundary
+```
+
+This plot shows aggregated uncertain regions, where clusters of uncertain locations form spatially coherent patterns.
+
+```{r warning=FALSE, fig.width=5, fig.height=8}
+res_quest$plots$aggregation
+```
+
+# Summary
+
+In this tutorial, we demonstrated how QUEST can be applied to spatial transcriptomics data to obtain fuzzy domain assignments, location-level uncertainty estimates, boundary uncertain locations, and aggregated uncertain regions. Together, these outputs provide a richer characterization of spatial domain structure than conventional hard clustering alone.
+
+# Session information
+
+```{r}
+sessionInfo()
+```

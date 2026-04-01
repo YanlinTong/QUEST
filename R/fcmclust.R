@@ -172,17 +172,21 @@ print.fcmclust <- function(x, ...) {
   cat("\nFuzziness parameter (m):\n")
   print(x$m, ...)
 
-  cat("\nMemberships (first 10 data):\n")
-  print(utils::head(x$membership, 10), ...)
+  cat("\nMemberships (first 5 observations and first 3 clusters):\n")
+  print(
+    x$membership[
+      1:min(5, nrow(x$membership)),
+      1:min(3, ncol(x$membership)),
+      drop = FALSE
+    ],
+    ...
+  )
 
-  cat("\nHard cluster labels (first 10 data):\n")
-  print(x$cluster[1:min(10, length(x$cluster))], ...)
+  cat("\nHard cluster labels (first 5 observations):\n")
+  print(x$cluster[1:min(5, length(x$cluster))], ...)
 
   cat("\nCluster sizes:\n")
   print(x$size, ...)
-
-  cat("\nCluster centers:\n")
-  print(x$centers, ...)
 
   cat("\nFinal objective value:\n")
   cat(x$withinerror, "\n")

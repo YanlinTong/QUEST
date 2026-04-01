@@ -3,3 +3,6 @@
 .Rhistory
 inst/doc
 data/
+.Rapp.history
+.DS_Store
+vignettes/*_cache/

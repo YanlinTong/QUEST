@@ -1,0 +1,44 @@
+url: https://yanlintong.github.io/QUEST/
+
+template:
+  bootstrap: 5
+
+home:
+  title: QUEST
+  description: Quantifying Uncertainty for Spatial Domain Detection in Spatial Transcriptomics
+
+navbar:
+  structure:
+    left:  [about, installation, example, experiments, data, reference]
+    right: [github]
+
+  components:
+
+    about:
+      text: About
+      href: index.html
+
+    installation:
+      text: Installation
+      href: articles/installation.html
+
+    example:
+      text: Example Analysis
+      href: articles/quest-tutorial.html
+
+    experiments:
+      text: Experiments
+      href: articles/experiments.html
+
+    data:
+      text: Data
+      href: articles/data.html
+
+    reference:
+      text: Reference
+      href: reference/index.html
+
+    github:
+      icon: fab fa-github
+      href: https://github.com/YanlinTong/QUEST
+      aria-label: GitHub repository

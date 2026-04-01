@@ -503,13 +503,14 @@ plot_aggregation <- function(
     title = "Aggregation",
     color_mode = c("status", "cluster", "igraph"),
     palette = NULL,
-    point_size = 1.45,
+    point_size = 1.5,
     aggre_size = 2.2,
     point_alpha = 1,
     legend_position = "bottom",
     strip_text_size = 16,
     legend_text_size = 12,
     legend_title_size = 12,
+    background_color = "grey85",
     ...
 ) {
   color_mode <- match.arg(color_mode)
@@ -609,6 +610,7 @@ plot_aggregation <- function(
         )
       ) +
       ggplot2::labs(x = "", y = "", colour = "Status")
+
   } else if (color_mode == "cluster") {
     p <- ggplot2::ggplot(
       datt,
@@ -631,13 +633,19 @@ plot_aggregation <- function(
     if (!is.null(palette)) {
       p <- p + ggplot2::scale_color_manual(values = palette)
     }
-  } else {
-    p <- ggplot2::ggplot(
-      datt[datt$is_aggre, , drop = FALSE],
-      ggplot2::aes(x = x, y = y, colour = igraph_cluster)
-    ) +
+
+  } else if (color_mode == "igraph") {
+    p <- ggplot2::ggplot(datt, ggplot2::aes(x = x, y = y)) +
       ggplot2::geom_point(
+        colour = background_color,
         size = point_size,
+        alpha = point_alpha,
+        ...
+      ) +
+      ggplot2::geom_point(
+        data = datt[datt$is_aggre, , drop = FALSE],
+        ggplot2::aes(colour = igraph_cluster),
+        size = aggre_size,
         alpha = point_alpha,
         ...
       ) +

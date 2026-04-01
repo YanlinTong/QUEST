@@ -1,0 +1,50 @@
+---
+title: "Installation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Installation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This vignette describes how to install the **QUEST** package and load it in R.
+
+# Install QUEST from GitHub
+
+You can install the development version of **QUEST** from GitHub using the `devtools` package:
+
+```{r eval=FALSE}
+install.packages("devtools")
+devtools::install_github("YanlinTong/QUEST")
+```
+
+# Load the package
+
+After installation, load the package with:
+
+```{r setup}
+library(QUEST)
+```
+
+# Check the installation
+
+You can confirm that the package was installed successfully by checking its version:
+
+```{r}
+packageVersion("QUEST")
+```
+
+# Session information
+
+```{r}
+sessionInfo()
+```

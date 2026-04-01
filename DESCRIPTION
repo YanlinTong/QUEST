@@ -6,8 +6,10 @@ Authors@R: c(
     person("Xiang", "Zhou", role = "aut"),
     person("Xiaoquan", "Wen", role = "ctb"),
     person("Jiandie", "Lin", role = "ctb"))
-Description: QUEST is a computational method for quantifying uncertainty for spatial domain detection in spatial transcriptomics. By leveraging fuzzy clustering, QUEST generates probabilistic domain assignments and location-level uncertainty estimates, enabling the separation of confidently assigned locations from ambiguous ones. Building on this uncertainty quantification framework, QUEST facilitates the identification of novel tissue structures, including transitional boundaries and heterogeneous subdomains, improves the accuracy of downstream analyses by prioritizing high-confidence locations, and helps guide the determination of the number of spatial domains.
+Description: QUEST is a computational method for quantifying uncertainty in spatial domain detection for spatial transcriptomics. By leveraging fuzzy clustering, QUEST generates probabilistic domain assignments and location-level uncertainty estimates, enabling the separation of confidently assigned locations from ambiguous ones. Building on this uncertainty quantification framework, QUEST facilitates the identification of novel tissue structures, including transitional boundaries and heterogeneous subdomains, improves the accuracy of downstream analyses by prioritizing high-confidence locations, and helps guide the determination of the number of spatial domains.
 License: MIT + file LICENSE
+URL: https://yanlintong.github.io/QUEST/, https://github.com/YanlinTong/QUEST
+BugReports: https://github.com/YanlinTong/QUEST/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -25,3 +27,7 @@ Imports:
 LazyData: true
 LinkingTo: 
     Rcpp
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

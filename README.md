@@ -5,7 +5,7 @@ QUEST is a computational method for uncertainty-aware spatial domain detection i
 The method is implemented as an open-source R package with efficient C++ acceleration via Rcpp.
 
 <p align="center">
-  <img src="figures/quest_scheme.png" width="800">
+  <img src="man/figures/quest_scheme.png" width="800" alt="Overview of the QUEST workflow">
 </p>
 
 ---
@@ -23,6 +23,6 @@ devtools::install_github("YanlinTong/QUEST")
 
 ## 📘 Tutorial
 
-This section demonstrates a minimal working example of the QUEST pipeline.
+This section demonstrates a working example of the QUEST pipeline.
 
-### Step 1: Example data
+👉 See the full tutorial [here](https://yanlintong.github.io/QUEST/articles/quest-tutorial.html).

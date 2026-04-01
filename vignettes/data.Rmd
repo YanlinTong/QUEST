@@ -1,0 +1,19 @@
+---
+title: "Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Data Source
+
+The datasets used in this study are publicly available and can be accessed through the [data repository](https://drive.google.com/drive/folders/1HMCD2JOhIjbTZnVl276P8uK9bua_pGxj).

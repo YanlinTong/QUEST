@@ -98,7 +98,7 @@ quest <- function(
     aggregation_n_neighbors = 10,
     aggregation_threshold_count = NULL,
     aggregation_threshold_prop = NULL,
-    add_high_uncertain_step1 = TRUE,
+    add_high_uncertain_step1 = FALSE,
     high_uncertainty_threshold_method = c("mean_sd", "quantile"),
     high_uncertainty_threshold_scale = 1.5,
     high_uncertainty_quantile_prob = NULL,
